@@ -6,23 +6,30 @@ public class MusicConductor : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private TextMeshProUGUI musicTimeText;
 
-    private double startDspTime;
+    [SerializeField] private double startDelay = 1.0;
+
+    private double songStartDspTime;
+
+    public double MusicTime { get; private set; }
 
     private void Start()
     {
-        startDspTime = AudioSettings.dspTime;
-        audioSource.Play();
+        MusicTime = 0;
+        songStartDspTime = AudioSettings.dspTime + startDelay;
+        audioSource.PlayScheduled(songStartDspTime);
     }
 
     private void Update()
     {
-        double musicTime = AudioSettings.dspTime - startDspTime;
-
-        if (musicTime < 0)
+        if (AudioSettings.dspTime < songStartDspTime)
         {
-            musicTime = 0;
+            MusicTime = 0;
+        }
+        else
+        {
+            MusicTime = AudioSettings.dspTime - songStartDspTime;
         }
 
-        musicTimeText.text = $"Music Time: {musicTime:F2}";
+        musicTimeText.text = $"Music Time: {MusicTime:F2}";
     }
 }
